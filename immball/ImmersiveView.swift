@@ -1,28 +1,31 @@
-//
-//  ImmersiveView.swift
-//  immball
-//
-//  Created by shokmd on 2025/04/24.
-//
-
 import SwiftUI
 import RealityKit
-import RealityKitContent
+import simd    // 4×4 行列を作るために必要
 
 struct ImmersiveView: View {
-    @Environment(AppModel.self) var appModel
-
     var body: some View {
         RealityView { content in
-            // Add the initial RealityKit content
-            if let immersiveContentEntity = try? await Entity(named: "Immersive", in: realityKitContentBundle) {
-                content.add(immersiveContentEntity)
-            }
+            // ── 1m 前方に平行移動した 4×4 行列を作成 ──
+            var transform = matrix_identity_float4x4
+            transform.columns.3 = SIMD4<Float>(0, 0, -1, 1)
+
+            // ── AnchorEntity(world:) でイニシャライズ ──
+            let anchor = AnchorEntity(world: transform)
+
+            // ── 球モデルを生成 ──
+            let mat    = SimpleMaterial(color: .systemPink, isMetallic: true)
+            let sphere = ModelEntity(
+                mesh: .generateSphere(radius: 0.1),
+                materials: [mat]
+            )
+
+            // ── シーンに追加 ──
+            anchor.addChild(sphere)
+            content.add(anchor)
         }
     }
 }
 
-#Preview(immersionStyle: .progressive) {
+#Preview(windowStyle: .automatic) {
     ImmersiveView()
-        .environment(AppModel())
 }

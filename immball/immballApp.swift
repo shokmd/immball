@@ -1,40 +1,15 @@
-//
-//  immballApp.swift
-//  immball
-//
-//  Created by shokmd on 2025/04/24.
-//
-
 import SwiftUI
 
 @main
-struct immballApp: App {
-
-    @State private var appModel = AppModel()
-    @State private var avPlayerViewModel = AVPlayerViewModel()
-
-    var body: some Scene {
-        WindowGroup {
-            if avPlayerViewModel.isPlaying {
-                AVPlayerView(viewModel: avPlayerViewModel)
-            } else {
-                ContentView()
-                    .environment(appModel)
-            }
-        }
-
-        ImmersiveSpace(id: appModel.immersiveSpaceID) {
+struct ImBallApp: App {
+    var body: some SwiftUI.Scene {
+        ImmersiveSpace(id: "Main") {
             ImmersiveView()
-                .environment(appModel)
-                .onAppear {
-                    appModel.immersiveSpaceState = .open
-                    avPlayerViewModel.play()
-                }
-                .onDisappear {
-                    appModel.immersiveSpaceState = .closed
-                    avPlayerViewModel.reset()
-                }
         }
-        .immersionStyle(selection: .constant(.progressive), in: .progressive)
+        // ← selection: と in: のラベルを両方付ける
+        .immersionStyle(
+            selection: .constant(.mixed),
+            in: .mixed
+        )
     }
 }
